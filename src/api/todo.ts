@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from "axios";
 
 const baseUrl: string = "http://localhost:4000";
 
-export const getTodos = async (): Promise<AxiosResponse<ApiDataType>> => {
+export const fetchTodos = async (): Promise<AxiosResponse<ApiDataType>> => {
   try {
     const todos: AxiosResponse<ApiDataType> = await axios.get(
       baseUrl + "/todos"
@@ -14,11 +14,11 @@ export const getTodos = async (): Promise<AxiosResponse<ApiDataType>> => {
 };
 
 export const addTodo = async (
-  formData: ITodo
+  formData: Omit<ITodo, "_id">
 ): Promise<AxiosResponse<ApiDataType>> => {
   try {
     const todo: Omit<ITodo, "_id"> = {
-      name: formData.name,
+      title: formData.title,
       description: formData.description,
       status: false,
     };
@@ -50,11 +50,11 @@ export const updateTodo = async (
 };
 
 export const deleteTodo = async (
-  _id: string
+  id: string
 ): Promise<AxiosResponse<ApiDataType>> => {
   try {
     const deletedTodo: AxiosResponse<ApiDataType> = await axios.delete(
-      `${baseUrl}/delete-todo/${_id}`
+      `${baseUrl}/delete-todo/${id}`
     );
     return deletedTodo;
   } catch (error) {

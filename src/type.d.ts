@@ -1,6 +1,6 @@
 interface ITodo {
   _id: string;
-  name: string;
+  title: string;
   description: string;
   status: boolean;
   createdAt?: string;

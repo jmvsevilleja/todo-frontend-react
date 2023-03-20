@@ -41,7 +41,7 @@ export const updateTodoAsync = createAsyncThunk(
 export const deleteTodoAsync = createAsyncThunk(
   "todo/deleteTodo",
   async (todo: ITodo) => {
-    const response = await deleteTodo(todo._id || "");
+    const response = await deleteTodo(todo._id);
     return response.data;
   }
 );
@@ -64,18 +64,17 @@ const todoSlice = createSlice({
           state.todos = action.payload.todos;
         }
       )
-      // .addCase(
-      //   fetchTodosAsync.rejected,
-      //   (state, action: PayloadAction<ApiDataType>) => {
-      //     state.status = "failed";
-      //     state.error = action.payload;
-      //   }
-      // )
+      .addCase(fetchTodosAsync.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message ?? null;
+      })
       // Create Todo reducers
       .addCase(
         createTodoAsync.fulfilled,
         (state, action: PayloadAction<ApiDataType>) => {
-          if (action.payload.todo) state.todos.push(action.payload.todo);
+          if (action.payload.todo) {
+            state.todos.push(action.payload.todo);
+          }
         }
       )
       // Update Todo reducers
@@ -85,16 +84,19 @@ const todoSlice = createSlice({
           const index = state.todos.findIndex(
             (todo) => todo._id === action.payload.todo?._id
           );
-          if (action.payload.todo) state.todos[index] = action.payload.todo;
+          if (action.payload.todo) {
+            state.todos[index] = action.payload.todo;
+          }
         }
       )
       // // Delete Todo reducers
       .addCase(
         deleteTodoAsync.fulfilled,
         (state, action: PayloadAction<ApiDataType>) => {
-          state.todos = state.todos.filter(
-            (todo) => todo._id !== action.payload.todo?._id
+          const index = state.todos.findIndex(
+            (todo) => todo._id === action.payload.todo?._id
           );
+          state.todos.splice(index, 1);
         }
       );
   },
